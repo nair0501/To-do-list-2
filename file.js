@@ -24,8 +24,7 @@ window.addEventListener('load', () => {
     taskInputEl.classList.add('text');
     taskInputEl.type = 'text';
     taskInputEl.value = task;
-    taskInputEl.setAttribute = ("readonly","readonly");
-    
+    taskInputEl.setAttribute = ("readonly");
     taskContentEl.appendChild(taskInputEl);
 
     const taskActionsEl = document.createElement('div');
@@ -54,7 +53,7 @@ window.addEventListener('load', () => {
       taskInputEl.focus();
       taskEditEl.innerHTML = "Save";
       } else {
-        taskInputEl.setAttribute('readonly','readonly');
+        taskInputEl.setAttribute('readonly');
         taskEditEl.innerHTML = "Edit";
       }
     });
