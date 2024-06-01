@@ -108,6 +108,7 @@ main {
 }
 
 #tasks .task .content {
+  display: flex;
   flex: 1 1 0%;
 }
 

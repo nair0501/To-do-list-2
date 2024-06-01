@@ -1,63 +1,92 @@
 
-  const form = document.querySelector('#new-task-form');
-  const input = document.querySelector('#new-task-input');
-  const listEl = document.querySelector('#tasks');
-  
-  form.addEventListener('submit', (e) => {
+class TaskManager {
+  constructor(formSelector, inputSelector, listSelector) {
+    this.form = document.querySelector(formSelector);
+    this.input = document.querySelector(inputSelector);
+    this.listEl = document.querySelector(listSelector);
+
+    this.form.addEventListener("submit", this.handleFormSubmit.bind(this));
+  }
+
+  handleFormSubmit(e) {
     e.preventDefault();
-    const task = input.value;
-    if(!task) {
-      alert('please fill out the task');
-      return
+    const task = this.input.value;
+    if (!task) {
+      alert("Please fill out the task");
+      return;
     }
-    const taskEl = document.createElement('div');
-    taskEl.classList.add('task');
+    this.addTask(task);
+    this.input.value = "";
+  }
 
-    const taskContentEl = document.createElement('div');
-    taskContentEl.classList.add('content');
+  addTask(task) {
+    const taskContainer = this.createTaskContainer();
+    const contentContainer = this.createContentContainer(taskContainer);
+    const taskInput = this.createTaskInput(contentContainer, task);
+    const buttonsContainer = this.createButtonsContainer(contentContainer);
 
-    taskEl.appendChild( taskContentEl);
-    
-    const taskInputEl = document.createElement('input');
-    taskInputEl.classList.add('text');
-    taskInputEl.type = 'text';
+    this.createButton(buttonsContainer, "Edit", () => {
+      this.toggleEditMode(taskInput);
+    },'edit');
+    this.createButton(buttonsContainer, "Delete", () => {
+      this.deleteTask(taskContainer);
+    },'delete');
+  }
+
+  createTaskContainer() {
+    const taskEl = document.createElement("div");
+    taskEl.classList.add("task");
+    this.listEl.appendChild(taskEl);
+    return taskEl;
+  }
+
+  createContentContainer(parentElement) {
+    const contentEl = document.createElement("div");
+    contentEl.classList.add("content");
+    parentElement.appendChild(contentEl);
+    return contentEl;
+  }
+
+  createTaskInput(parentElement, task) {
+    const taskInputEl = document.createElement("input");
+    taskInputEl.classList.add("text");
+    taskInputEl.type = "text";
     taskInputEl.value = task;
-    taskInputEl.setAttribute("readonly","readonly");
-    taskContentEl.appendChild(taskInputEl);
+    taskInputEl.setAttribute("readonly", "readonly");
+    parentElement.appendChild(taskInputEl);
+    return taskInputEl;
+  }
 
-    const taskActionsEl = document.createElement('div');
-    taskActionsEl.classList.add('actions');
+  createButtonsContainer(parentElement) {
+    const buttonsEl = document.createElement("div");
+    buttonsEl.classList.add("actions");
+    parentElement.appendChild(buttonsEl);
+    return buttonsEl;
+  }
 
-    const taskEditEl = document.createElement('button');
-    taskEditEl.classList.add('edit');
-    taskEditEl.innerHTML = "Edit";
+  createButton(parentElement, text, onClick, ...className) {
+    const buttonEl = document.createElement("button");
+    buttonEl.innerHTML = text;
+    if (className) {
+        buttonEl.classList.add(className); 
+    }
+    buttonEl.addEventListener("click", onClick);
+    parentElement.appendChild(buttonEl);
+    return buttonEl;
+}
 
-    const taskDeleteEl = document.createElement('button');
-    taskDeleteEl.classList.add('delete');
-    taskDeleteEl.innerHTML = "Delete";
+  toggleEditMode(taskInput) {
+    if (taskInput.readOnly) {
+      taskInput.removeAttribute("readonly");
+      taskInput.focus();
+    } else {
+      taskInput.setAttribute("readonly", "readonly");
+    }
+  }
 
-    taskActionsEl.appendChild(taskEditEl);
-    taskActionsEl.appendChild(taskDeleteEl);
+  deleteTask(taskContainer) {
+    this.listEl.removeChild(taskContainer);
+  }
+}
+const taskManager = new TaskManager("#new-task-form", "#new-task-input", "#tasks");
 
-    taskEl.appendChild(taskActionsEl);
-
-    listEl.appendChild(taskEl);
-    
-    input.value = "";
-
-    taskEditEl.addEventListener('click', () => {
-      if(taskEditEl.innerHTML.toLowerCase() == "edit"){
-      taskInputEl.removeAttribute('readonly');
-      taskInputEl.focus();
-      taskEditEl.innerHTML = "Save";
-      } else {
-        console.log('taskInputEl',taskInputEl);
-        taskInputEl.setAttribute('readonly','readonly');
-        taskEditEl.innerHTML = "Edit";
-      }
-    });
-
-    taskDeleteEl.addEventListener('click', () => {
-      listEl.removeChild(taskEl);
-    });
-  });
