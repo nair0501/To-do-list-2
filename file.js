@@ -1,9 +1,10 @@
-
 class TaskManager {
   constructor(formSelector, inputSelector, listSelector) {
     this.form = document.querySelector(formSelector);
     this.input = document.querySelector(inputSelector);
     this.listEl = document.querySelector(listSelector);
+
+    this.loadTasks();
 
     this.form.addEventListener("submit", this.handleFormSubmit.bind(this));
   }
@@ -16,6 +17,7 @@ class TaskManager {
       return;
     }
     this.addTask(task);
+    this.saveTasks();
     this.input.value = "";
   }
 
@@ -25,12 +27,15 @@ class TaskManager {
     const taskInput = this.createTaskInput(contentContainer, task);
     const buttonsContainer = this.createButtonsContainer(contentContainer);
 
-    this.createButton(buttonsContainer, "Edit", () => {
-      this.toggleEditMode(taskInput);
-    },'edit');
-    this.createButton(buttonsContainer, "Delete", () => {
+    const editButton = this.createButton(buttonsContainer, "Edit", () => {
+      this.toggleEditMode(taskInput, editButton);
+    }, 'edit');
+    const deleteButton = this.createButton(buttonsContainer, "Delete", () => {
       this.deleteTask(taskContainer);
-    },'delete');
+      this.saveTasks();
+    }, 'delete');
+
+    this.saveTasks();  // Save tasks to local storage whenever a new task is added
   }
 
   createTaskContainer() {
@@ -68,25 +73,44 @@ class TaskManager {
     const buttonEl = document.createElement("button");
     buttonEl.innerHTML = text;
     if (className) {
-        buttonEl.classList.add(className); 
+        buttonEl.classList.add(...className); 
     }
     buttonEl.addEventListener("click", onClick);
     parentElement.appendChild(buttonEl);
     return buttonEl;
-}
+  }
 
-  toggleEditMode(taskInput) {
+  toggleEditMode(taskInput, editButton) {
     if (taskInput.readOnly) {
-      taskInput.removeAttribute("readonly");
+      taskInput.readOnly = false;
       taskInput.focus();
+      editButton.innerHTML = "Save";
     } else {
-      taskInput.setAttribute("readonly", "readonly");
+      taskInput.readOnly = true;
+      editButton.innerHTML = "Edit";
+      this.saveTasks(); // Save tasks to local storage whenever a task is edited
     }
   }
 
   deleteTask(taskContainer) {
     this.listEl.removeChild(taskContainer);
   }
+
+  saveTasks() {
+    const tasks = [];
+    this.listEl.querySelectorAll(".task").forEach(taskEl => {
+      const taskInput = taskEl.querySelector(".text");
+      tasks.push(taskInput.value);
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+
+  loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.forEach(task => this.addTask(task));
+  }
 }
+
 const taskManager = new TaskManager("#new-task-form", "#new-task-input", "#tasks");
+
 
