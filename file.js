@@ -35,7 +35,7 @@ class TaskManager {
       this.saveTasks();
     }, 'delete');
 
-    this.saveTasks();  // Save tasks to local storage whenever a new task is added
+    this.saveTasks(); 
   }
 
   createTaskContainer() {
@@ -68,12 +68,11 @@ class TaskManager {
     parentElement.appendChild(buttonsEl);
     return buttonsEl;
   }
-
-  createButton(parentElement, text, onClick, ...className) {
+  createButton(parentElement, text, onClick,className) {
     const buttonEl = document.createElement("button");
     buttonEl.innerHTML = text;
     if (className) {
-        buttonEl.classList.add(...className); 
+        buttonEl.classList.add(className); 
     }
     buttonEl.addEventListener("click", onClick);
     parentElement.appendChild(buttonEl);
@@ -82,13 +81,13 @@ class TaskManager {
 
   toggleEditMode(taskInput, editButton) {
     if (taskInput.readOnly) {
-      taskInput.readOnly = false;
+      taskInput.removeAttribute("readonly");
       taskInput.focus();
       editButton.innerHTML = "Save";
     } else {
       taskInput.readOnly = true;
       editButton.innerHTML = "Edit";
-      this.saveTasks(); // Save tasks to local storage whenever a task is edited
+      this.saveTasks(); // 
     }
   }
 
