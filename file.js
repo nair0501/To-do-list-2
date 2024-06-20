@@ -27,15 +27,26 @@ class TaskManager {
     const taskInput = this.createTaskInput(contentContainer, task);
     const buttonsContainer = this.createButtonsContainer(contentContainer);
 
-    const editButton = this.createButton(buttonsContainer, "Edit", () => {
-      this.toggleEditMode(taskInput, editButton);
-    }, 'edit');
-    const deleteButton = this.createButton(buttonsContainer, "Delete", () => {
-      this.deleteTask(taskContainer);
-      this.saveTasks();
-    }, 'delete');
+    const editButtonParams = {
+      parentElement: buttonsContainer,
+      text: "Edit",
+      onClick: () => this.toggleEditMode(taskInput, editButton),
+      className: "edit"
+    };
+    const deleteButtonParams = {
+      parentElement: buttonsContainer,
+      text: "Delete",
+      onClick: () => {
+        this.deleteTask(taskContainer);
+        this.saveTasks();
+      },
+      className: "delete"
+    };
 
-    this.saveTasks(); 
+    const editButton = this.createButton(editButtonParams);
+    this.createButton(deleteButtonParams);
+
+    this.saveTasks();
   }
 
   createTaskContainer() {
@@ -68,14 +79,15 @@ class TaskManager {
     parentElement.appendChild(buttonsEl);
     return buttonsEl;
   }
-  createButton(parentElement, text, onClick,className) {
+
+  createButton(params) {
     const buttonEl = document.createElement("button");
-    buttonEl.innerHTML = text;
-    if (className) {
-        buttonEl.classList.add(className); 
+    buttonEl.innerHTML = params.text;
+    if (params.className) {
+      buttonEl.classList.add(params.className);
     }
-    buttonEl.addEventListener("click", onClick);
-    parentElement.appendChild(buttonEl);
+    buttonEl.addEventListener("click", params.onClick);
+    params.parentElement.appendChild(buttonEl);
     return buttonEl;
   }
 
@@ -111,5 +123,3 @@ class TaskManager {
 }
 
 const taskManager = new TaskManager("#new-task-form", "#new-task-input", "#tasks");
-
-
